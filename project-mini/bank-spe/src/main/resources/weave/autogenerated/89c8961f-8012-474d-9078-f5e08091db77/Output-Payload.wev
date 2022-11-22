@@ -1,0 +1,12 @@
+%dw 2.0
+
+type auto_89c8961f_8012_474d_9078_f5e08091db77_Output_Payload = {
+  bank: {
+    accno: Number, 
+    name: String, 
+    branch: String, 
+    _?: Any
+  }, 
+  _?: Any
+}
+

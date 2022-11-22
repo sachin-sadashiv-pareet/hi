@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+    <apikit:config name="mini-project-spe-config" api="mini-project-spe.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<global-property doc:name="Global Property" doc:id="6d72a9cb-925a-4c74-8b4e-b83e860c6338" name="env" value="dev" />
+	<api-gateway:autodiscovery apiId="18215699" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="efcf209f-a856-4e09-b55b-8f180b8d745b" flowRef="mini-project-spe-main" />
+	<configuration-properties doc:name="Configuration properties" doc:id="f8b82362-73f2-4805-b1ba-35ea5b45eccc" file="propeties/dev.yaml" />
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="cf515246-0828-41a0-87bc-f83d4054e733" >
+		<vm:queues >
+			<vm:queue queueName="vm" />
+		</vm:queues>
+	</vm:config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="6467b75c-31e7-4416-b638-b6fdf4366996" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="03aa7be0-01f1-4634-8d8f-4249a17e84b1" >
+		<http:request-connection host="${http.host}" port="${http.port}" />
+	</http:request-config>
+	
+	
+</mule>

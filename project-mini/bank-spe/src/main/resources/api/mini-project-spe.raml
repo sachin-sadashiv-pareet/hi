@@ -1,0 +1,29 @@
+#%RAML 1.0
+title: mini-project-spe
+
+
+types :
+  get-bank-res : !include /types/get-bank-res-types.raml
+
+traits:
+  common-responce: !include /exchange_modules/d958ac3e-58c5-4532-a492-32bfa28b581f/common-responce/1.0.0/common-responce.raml
+  
+
+
+
+
+/bank:
+  /{ifsc}:
+    get:
+      is:
+        - common-responce
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include /examples/get-bank-res.json
+              type : get-bank-res
+      
+
+
+

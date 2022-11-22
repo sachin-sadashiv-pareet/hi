@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="bank-spe-implFlow" doc:id="89c8961f-8012-474d-9078-f5e08091db77" >
+		<ee:transform doc:name="XML TO JSON" doc:id="4170513d-c3e5-426c-8823-be571ec4629c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<vm:publish doc:name="Publish" doc:id="c9b6d73f-3f21-4b62-9c9c-48065c3d8876" queueName="vm" config-ref="VM_Config"/>
+	</flow>
+	<flow name="bank-spe-implFlow1" doc:id="9e0633f9-d70d-46de-aa4d-25e9e3b66036" >
+		<vm:listener queueName="vm" doc:name="Listener" doc:id="cb6f413e-c401-49f2-81c8-f7641067d5ff" config-ref="VM_Config"/>
+		<ee:transform doc:name="JSON TO CSV" doc:id="b482f75b-0353-4511-a929-311c2427fcbb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/csv
+---
+[payload].note]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<file:write doc:name="Write" doc:id="ccb8bd0d-eadb-487b-9649-9c85b99cd3ab" path="D:\bank\reuslt.csv"/>
+	</flow>
+	<flow name="bank-spe-implFlow2" doc:id="af12e1ca-65ff-450f-b722-10aa6c431dcf" >
+		<file:listener doc:name="On New or Updated File" doc:id="65754ff6-645a-46fe-8c24-3c7961effb8c" directory="D:\bank" outputMimeType="application/csv" config-ref="File_Config">
+			<scheduling-strategy >
+				<fixed-frequency />
+			</scheduling-strategy>
+			<file:matcher filenamePattern="*.csv" />
+		</file:listener>
+		<ee:transform doc:name="CSV TO JAVA" doc:id="7ebfb9a1-73c3-42ce-8f8f-43fec53e8e3d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="5cbddc54-b7a4-4d1b-a5a6-64923d50807e" >
+			<http:request method="GET" doc:name="Request" doc:id="1f1c4a4d-7b10-4384-9708-8df19f2c3284" path="/suscess" config-ref="HTTP_Request_configuration"/>
+		</until-successful>
+		<logger level="INFO" doc:name="Logger" doc:id="6da23dfb-e604-41d5-bd01-7e53f3fea362" message="#[payload]"/>
+	</flow>
+	<flow name="bank-spe-implFlow3" doc:id="8438dd39-9f70-4801-9653-09d682122897" >
+		<http:listener doc:name="Listener" doc:id="7c91d34d-4087-4fb5-9049-796077966b2f" path="/suscess" config-ref="HTTP_Listener_config"/>
+		<ee:transform doc:name="Transform Message" doc:id="a09713d1-b261-43f7-ba31-bc2a833cb613" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	meassage : "suscessfull "
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
